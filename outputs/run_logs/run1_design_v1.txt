@@ -1,0 +1,54 @@
+Data quality: {'rows': 16436, 'columns': 10, 'first_date': '1981-01-01', 'last_date': '2025-12-31', 'expected_days_in_range': 16436, 'missing_calendar_dates': 0, 'duplicate_dates': 0, 'missing_values_per_column': {'tmax': 0, 'tmin': 0, 'tmean': 0, 'dewpoint': 0, 'rh': 0, 'qv': 0, 'precip': 0, 'wind_speed': 0, 'wind_dir': 0, 'pressure': 0}, 'out_of_physical_range_per_column': {'tmax': 0, 'tmin': 0, 'tmean': 0, 'dewpoint': 0, 'rh': 0, 'qv': 0, 'precip': 0, 'wind_speed': 0, 'wind_dir': 0, 'pressure': 0}, 'tmin_greater_than_tmax': 0, 'tmean_outside_tmin_tmax': 0}
+             rows first target date last target date  mean target Tmax (°C)
+split                                                                      
+train       11657        1981-02-01       2012-12-31                  32.25
+validation   2191        2013-01-01       2018-12-31                  32.45
+test         2557        2019-01-01       2025-12-31                  32.03
+
+== Time-series CV tuning (training period only) ==
+Linear Regression  CV MAE 0.846 ± 0.034 °C (1 candidates, 0.2 s) {}
+SVR (RBF)          CV MAE 0.807 ± 0.029 °C (18 candidates, 34.2 s) {'model__C': 10.0, 'model__epsilon': 0.3, 'model__gamma': 0.005}
+Random Forest      CV MAE 0.834 ± 0.029 °C (8 candidates, 50.6 s) {'model__n_estimators': 200, 'model__min_samples_leaf': 5, 'model__max_features': 0.33, 'model__max_depth': 12}
+                     cv_mae  cv_mae_std  n_candidates  seconds
+model                                                         
+Linear Regression  0.845666    0.033739             1      0.2
+SVR (RBF)          0.807083    0.029480            18     34.2
+Random Forest      0.834483    0.029168             8     50.6
+
+== Validation period 2013-2018 ==
+                                  MAE    MSE   RMSE     R2  Bias (pred - actual)       n
+Persistence (tomorrow = today)  0.903  1.715  1.310  0.845                 0.001  2191.0
+Seasonal average                1.304  2.883  1.698  0.739                -0.214  2191.0
+Linear Regression               0.820  1.336  1.156  0.879                -0.130  2191.0
+SVR (RBF)                       0.783  1.263  1.124  0.886                -0.001  2191.0
+Random Forest                   0.803  1.290  1.136  0.883                -0.079  2191.0
+Selected by rule: Linear Regression
+
+== Final test period 2019-2025 (models refitted on 1981-2018) ==
+                                  MAE    MSE   RMSE     R2  Bias (pred - actual)       n
+Persistence (tomorrow = today)  0.854  1.456  1.207  0.868                -0.000  2557.0
+Seasonal average                1.195  2.511  1.584  0.772                 0.246  2557.0
+Linear Regression               0.772  1.125  1.061  0.898                -0.095  2557.0
+SVR (RBF)                       0.744  1.072  1.036  0.903                 0.007  2557.0
+Random Forest                   0.758  1.093  1.046  0.901                -0.094  2557.0
+                                hot_days  MAE_on_hot_days  Bias_on_hot_days  hit_rate (recall)  precision  false_alarms  missed
+Persistence (tomorrow = today)     192.0            0.824            -0.594              0.500      0.487         101.0    96.0
+Seasonal average                   192.0            2.220            -2.220              0.000        NaN           0.0   192.0
+Linear Regression                  192.0            1.157            -1.142              0.172      0.717          13.0   159.0
+SVR (RBF)                          192.0            0.980            -0.939              0.271      0.598          35.0   140.0
+Random Forest                      192.0            1.090            -1.056              0.234      0.682          21.0   147.0
+          feature  MAE increase (°C)    std
+0      tmean_lag0              1.741  0.009
+1      target_doy              1.057  0.007
+2         qv_lag0              0.968  0.022
+3         rh_lag0              0.369  0.011
+4     wind_u_lag0              0.315  0.008
+5       tmax_lag0              0.262  0.006
+6       issue_doy              0.209  0.005
+7  target_doy_cos              0.159  0.005
+8   wind_u_mean_3              0.101  0.005
+9   dewpoint_lag0              0.096  0.007
+Saved model: D:\SRM\5th Semester\Global Warming\Explainable-Heat-Prediction\models\final_model.joblib | deployed: {'name': 'Linear Regression', 'fitted_on': 'train + validation target dates (1981-2012 and 2013-2018)', 'hyperparameters': {}}
+Recent cache saved through 2026-11-07
+
+[exited with code 0]

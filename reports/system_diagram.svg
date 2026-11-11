@@ -1,0 +1,146 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 620" width="960" height="620" font-family="Segoe UI, system-ui, sans-serif">
+  <title>System diagram: Explainable next-day heat prediction for Chennai</title>
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#52514e"/>
+    </marker>
+    <style>
+      .box { fill: #ffffff; stroke: #c3c2b7; stroke-width: 1.2; }
+      .data { fill: #eef4fc; stroke: #2a78d6; }
+      .ml { fill: #fff3ec; stroke: #eb6834; }
+      .app { fill: #e9f7f1; stroke: #1baf7a; }
+      .t { font-size: 13px; font-weight: 600; fill: #0b0b0b; }
+      .s { font-size: 11px; fill: #52514e; }
+      .lbl { font-size: 11px; fill: #52514e; font-style: italic; }
+      .sec { font-size: 12px; font-weight: 700; fill: #898781; letter-spacing: 1px; }
+      .line { stroke: #52514e; stroke-width: 1.4; fill: none; marker-end: url(#arr); }
+      .dash { stroke: #52514e; stroke-width: 1.2; fill: none; stroke-dasharray: 5 4; marker-end: url(#arr); }
+    </style>
+  </defs>
+  <rect x="0" y="0" width="960" height="620" fill="#fcfcfb"/>
+
+  <text class="sec" x="24" y="30">1  DATA</text>
+  <text class="sec" x="140" y="224">2  MODELLING (notebook / scripts/train.py)</text>
+  <text class="sec" x="150" y="450">3  PUBLIC INTERFACE (Streamlit app)</text>
+
+  <!-- Data row -->
+  <rect class="box data" x="24" y="44" width="200" height="120" rx="8"/>
+  <text class="t" x="36" y="66">NASA POWER Daily API</text>
+  <text class="s" x="36" y="86">Point 13.08°N, 80.27°E</text>
+  <text class="s" x="36" y="102">MERRA-2 / GEOS-IT, ½°×⅝° grid</text>
+  <text class="s" x="36" y="118">10 daily variables, LST days</text>
+  <text class="s" x="36" y="134">fill value −999, lag 2–3 days</text>
+  <text class="s" x="36" y="150">1981 → near real time</text>
+
+  <rect class="box data" x="270" y="44" width="200" height="56" rx="8"/>
+  <text class="t" x="282" y="66">Frozen snapshot 1981–2025</text>
+  <text class="s" x="282" y="84">data/…_1981_2025.csv + request URL</text>
+
+  <rect class="box data" x="270" y="108" width="200" height="56" rx="8"/>
+  <text class="t" x="282" y="130">Recent data 2026 →</text>
+  <text class="s" x="282" y="148">live request, else bundled cache</text>
+
+  <rect class="box data" x="516" y="44" width="200" height="120" rx="8"/>
+  <text class="t" x="528" y="66">Quality checks</text>
+  <text class="s" x="528" y="86">rows, coverage, duplicates</text>
+  <text class="s" x="528" y="102">−999 → missing, gaps re-inserted</text>
+  <text class="s" x="528" y="118">physical ranges, Tmin ≤ Tmax</text>
+  <text class="s" x="528" y="134">availability at prediction time</text>
+
+  <rect class="box data" x="762" y="44" width="176" height="120" rx="8"/>
+  <text class="t" x="774" y="66">Features for day D</text>
+  <text class="s" x="774" y="86">lags 0–6, rolling 3–30 d</text>
+  <text class="s" x="774" y="102">(windows END on D)</text>
+  <text class="s" x="774" y="118">wind u/v, pressure change</text>
+  <text class="s" x="774" y="134">calendar of D+1, years</text>
+  <text class="s" x="774" y="150">Target: Tmax of D+1</text>
+
+  <path class="line" d="M224,72 H268"/>
+  <path class="line" d="M224,136 H268"/>
+  <path class="line" d="M470,72 H514"/>
+  <path class="line" d="M470,136 H514"/>
+  <path class="line" d="M716,104 H760"/>
+
+  <!-- Modelling row -->
+  <rect class="box ml" x="24" y="236" width="196" height="132" rx="8"/>
+  <text class="t" x="36" y="258">Chronological split</text>
+  <text class="s" x="36" y="278">(by target date)</text>
+  <text class="s" x="36" y="296">Train 1981–2012</text>
+  <text class="s" x="36" y="312">Validation 2013–2018</text>
+  <text class="s" x="36" y="328">Test 2019–2025 (held out)</text>
+  <text class="s" x="36" y="344">Live 2026 → (app only)</text>
+
+  <rect class="box ml" x="250" y="236" width="230" height="132" rx="8"/>
+  <text class="t" x="262" y="258">scikit-learn pipeline</text>
+  <text class="s" x="262" y="278">ClimatologyTransformer (seasonal</text>
+  <text class="s" x="262" y="294">  normal, anomalies) → median imputer</text>
+  <text class="s" x="262" y="310">  → StandardScaler → model</text>
+  <text class="s" x="262" y="328">all fitted on training rows only</text>
+  <text class="s" x="262" y="346">TimeSeriesSplit(5, gap 30 d) tuning</text>
+
+  <rect class="box ml" x="510" y="236" width="210" height="132" rx="8"/>
+  <text class="t" x="522" y="258">Compare &amp; select</text>
+  <text class="s" x="522" y="278">Baselines: persistence, seasonal</text>
+  <text class="s" x="522" y="294">Candidates: LR, SVR, Random Forest</text>
+  <text class="s" x="522" y="310">Rule on validation MAE; prefer</text>
+  <text class="s" x="522" y="326">simpler within 0.05 °C</text>
+  <text class="s" x="522" y="346">→ Linear Regression</text>
+
+  <rect class="box ml" x="750" y="236" width="188" height="132" rx="8"/>
+  <text class="t" x="762" y="258">Test once &amp; explain</text>
+  <text class="s" x="762" y="278">refit on 1981–2018</text>
+  <text class="s" x="762" y="294">MAE, MSE, R², hot-day skill</text>
+  <text class="s" x="762" y="310">residual analysis</text>
+  <text class="s" x="762" y="326">coefficients, permutation</text>
+  <text class="s" x="762" y="342">importance, exact local effects</text>
+
+  <path class="line" d="M850,164 V200 H122 V234"/>
+  <path class="line" d="M220,302 H248"/>
+  <path class="line" d="M480,302 H508"/>
+  <path class="line" d="M720,302 H748"/>
+
+  <!-- Heat indicator -->
+  <rect class="box ml" x="250" y="384" width="470" height="48" rx="8"/>
+  <text class="t" x="262" y="404">Heat indicator (training data only)</text>
+  <text class="s" x="262" y="421">P90 of 1981–2012 Tmax (±7 days) · chance = 1 − Φ((P90 − pred)/σ_month) · flag if ≥ 35 %</text>
+  <path class="dash" d="M122,368 V408 H248"/>
+
+  <!-- Artifacts -->
+  <rect class="box" x="750" y="384" width="188" height="48" rx="8"/>
+  <text class="t" x="762" y="404">Saved artifacts</text>
+  <text class="s" x="762" y="421">model, metadata, backtest CSV</text>
+  <path class="line" d="M844,368 V382"/>
+
+  <!-- App row -->
+  <rect class="box app" x="24" y="486" width="216" height="112" rx="8"/>
+  <text class="t" x="36" y="508">Next-day prediction</text>
+  <text class="s" x="36" y="528">latest complete day D shown</text>
+  <text class="s" x="36" y="544">predicted Tmax for D+1</text>
+  <text class="s" x="36" y="560">chance of unusual heat + flag</text>
+  <text class="s" x="36" y="576">recent-days chart</text>
+
+  <rect class="box app" x="262" y="486" width="216" height="112" rx="8"/>
+  <text class="t" x="274" y="508">Historical backtest</text>
+  <text class="s" x="274" y="528">pick a date; data cut at day before</text>
+  <text class="s" x="274" y="544">prediction vs actual, error</text>
+  <text class="s" x="274" y="560">in-sample vs test vs live label</text>
+
+  <rect class="box app" x="500" y="486" width="216" height="112" rx="8"/>
+  <text class="t" x="512" y="508">Plain-language explanation</text>
+  <text class="s" x="512" y="528">normal-day prediction for date</text>
+  <text class="s" x="512" y="544">+ grouped effects (exact sum)</text>
+  <text class="s" x="512" y="560">"associations, not causes"</text>
+
+  <rect class="box app" x="738" y="486" width="200" height="112" rx="8"/>
+  <text class="t" x="750" y="508">Metrics &amp; limitations</text>
+  <text class="s" x="750" y="528">test metrics for all models</text>
+  <text class="s" x="750" y="544">hot-day skill, calibration</text>
+  <text class="s" x="750" y="560">data source, trends, caveats</text>
+  <text class="s" x="750" y="576">not an IMD forecast</text>
+
+  <path class="line" d="M844,432 V462 H132 V484"/>
+  <path class="line" d="M370,462 V484"/>
+  <path class="line" d="M608,462 V484"/>
+  <path class="line" d="M838,462 V484"/>
+  <text class="lbl" x="560" y="193">features of D only → no target leakage</text>
+</svg>

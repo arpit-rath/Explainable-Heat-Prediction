@@ -1,0 +1,64 @@
+{
+  "source": "NASA POWER Daily API",
+  "api_version": "v2.10.3",
+  "data_sources": [
+    "MERRA2",
+    "POWER"
+  ],
+  "fill_value": -999.0,
+  "time_standard": "LST",
+  "grid_cell_geometry": {
+    "type": "Point",
+    "coordinates": [
+      80.271,
+      13.083,
+      48.95
+    ]
+  },
+  "parameters": {
+    "T2M_MAX": {
+      "units": "C",
+      "longname": "Temperature at 2 Meters Maximum"
+    },
+    "T2M_MIN": {
+      "units": "C",
+      "longname": "Temperature at 2 Meters Minimum"
+    },
+    "T2M": {
+      "units": "C",
+      "longname": "Temperature at 2 Meters"
+    },
+    "T2MDEW": {
+      "units": "C",
+      "longname": "Dew/Frost Point at 2 Meters"
+    },
+    "RH2M": {
+      "units": "%",
+      "longname": "Relative Humidity at 2 Meters"
+    },
+    "QV2M": {
+      "units": "g/kg",
+      "longname": "Specific Humidity at 2 Meters"
+    },
+    "PRECTOTCORR": {
+      "units": "mm/day",
+      "longname": "Precipitation Corrected"
+    },
+    "WS2M": {
+      "units": "m/s",
+      "longname": "Wind Speed at 2 Meters"
+    },
+    "WD2M": {
+      "units": "Degrees",
+      "longname": "Wind Direction at 2 Meters"
+    },
+    "PS": {
+      "units": "kPa",
+      "longname": "Surface Pressure"
+    }
+  },
+  "request_url": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M_MAX,T2M_MIN,T2M,T2MDEW,RH2M,QV2M,PRECTOTCORR,WS2M,WD2M,PS&community=AG&longitude=80.2707&latitude=13.0827&start=19810101&end=20251231&format=JSON&time-standard=LST",
+  "retrieved_utc": "2026-11-10T15:59:00+00:00",
+  "requested_start": "1981-01-01",
+  "requested_end": "2025-12-31"
+}

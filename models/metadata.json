@@ -1,0 +1,520 @@
+{
+  "project": "Explainable Next-Day Extreme Heat Prediction for Chennai",
+  "created_utc": "2026-11-10T17:04:51+00:00",
+  "location": {
+    "name": "Chennai, Tamil Nadu, India",
+    "latitude": 13.0827,
+    "longitude": 80.2707
+  },
+  "data": {
+    "source": "NASA POWER Daily API",
+    "api_version": "v2.10.3",
+    "data_sources": [
+      "MERRA2",
+      "POWER"
+    ],
+    "fill_value": -999.0,
+    "time_standard": "LST",
+    "grid_cell_geometry": {
+      "type": "Point",
+      "coordinates": [
+        80.271,
+        13.083,
+        48.95
+      ]
+    },
+    "parameters": {
+      "T2M_MAX": {
+        "units": "C",
+        "longname": "Temperature at 2 Meters Maximum"
+      },
+      "T2M_MIN": {
+        "units": "C",
+        "longname": "Temperature at 2 Meters Minimum"
+      },
+      "T2M": {
+        "units": "C",
+        "longname": "Temperature at 2 Meters"
+      },
+      "T2MDEW": {
+        "units": "C",
+        "longname": "Dew/Frost Point at 2 Meters"
+      },
+      "RH2M": {
+        "units": "%",
+        "longname": "Relative Humidity at 2 Meters"
+      },
+      "QV2M": {
+        "units": "g/kg",
+        "longname": "Specific Humidity at 2 Meters"
+      },
+      "PRECTOTCORR": {
+        "units": "mm/day",
+        "longname": "Precipitation Corrected"
+      },
+      "WS2M": {
+        "units": "m/s",
+        "longname": "Wind Speed at 2 Meters"
+      },
+      "WD2M": {
+        "units": "Degrees",
+        "longname": "Wind Direction at 2 Meters"
+      },
+      "PS": {
+        "units": "kPa",
+        "longname": "Surface Pressure"
+      }
+    },
+    "request_url": "https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M_MAX,T2M_MIN,T2M,T2MDEW,RH2M,QV2M,PRECTOTCORR,WS2M,WD2M,PS&community=AG&longitude=80.2707&latitude=13.0827&start=19810101&end=20251231&format=JSON&time-standard=LST",
+    "retrieved_utc": "2026-11-10T15:59:00+00:00",
+    "requested_start": "1981-01-01",
+    "requested_end": "2025-12-31"
+  },
+  "target": "Next-day (D+1) daily maximum 2 m air temperature, \u00b0C (NASA POWER T2M_MAX)",
+  "splits_by_target_date": {
+    "train": [
+      "1981-01-01",
+      "2012-12-31"
+    ],
+    "validation": [
+      "2013-01-01",
+      "2018-12-31"
+    ],
+    "test": [
+      "2019-01-01",
+      "2025-12-31"
+    ],
+    "live": "after 2025-12-31 (never used for fitting)"
+  },
+  "rows_per_split": {
+    "train": 11657,
+    "test": 2557,
+    "validation": 2191
+  },
+  "deployed_model": {
+    "name": "Linear Regression",
+    "fitted_on": "train + validation target dates (1981-2012 and 2013-2018)",
+    "hyperparameters": {}
+  },
+  "selection_rule": "Lowest validation MAE among ML candidates; a simpler model within 0.05 \u00b0C of the best is preferred (simplicity order: ['Linear Regression', 'Random Forest', 'SVR (RBF)']).",
+  "tuning": {
+    "Linear Regression": {
+      "model": "Linear Regression",
+      "best_params": {},
+      "cv_mae": 0.8585987174520427,
+      "cv_mae_std": 0.050882247325862225,
+      "n_candidates": 1,
+      "seconds": 1.9
+    },
+    "SVR (RBF)": {
+      "model": "SVR (RBF)",
+      "best_params": {
+        "model__C": 30.0,
+        "model__epsilon": 0.5,
+        "model__gamma": 0.002
+      },
+      "cv_mae": 0.8176703240996908,
+      "cv_mae_std": 0.03497890940253978,
+      "n_candidates": 18,
+      "seconds": 714.8
+    },
+    "Random Forest": {
+      "model": "Random Forest",
+      "best_params": {
+        "model__n_estimators": 200,
+        "model__min_samples_leaf": 10,
+        "model__max_features": 0.5,
+        "model__max_depth": 20
+      },
+      "cv_mae": 0.8339476317494666,
+      "cv_mae_std": 0.03050821414400843,
+      "n_candidates": 8,
+      "seconds": 843.6
+    }
+  },
+  "validation_metrics": {
+    "Persistence (tomorrow = today)": {
+      "MAE": 0.9031401186672752,
+      "MSE": 1.715302053856686,
+      "RMSE": 1.3096954049918195,
+      "R2": 0.8446794059811984,
+      "Bias (pred - actual)": 0.0008397991784573253,
+      "n": 2191.0
+    },
+    "Seasonal average": {
+      "MAE": 1.3042617068383873,
+      "MSE": 2.882534820461013,
+      "RMSE": 1.6978029392308793,
+      "R2": 0.7389864836999191,
+      "Bias (pred - actual)": -0.21373575763508187,
+      "n": 2191.0
+    },
+    "Linear Regression": {
+      "MAE": 0.8111486573709326,
+      "MSE": 1.322388633635303,
+      "RMSE": 1.1499515788220402,
+      "R2": 0.8802577145884375,
+      "Bias (pred - actual)": -0.05639059750993947,
+      "n": 2191.0
+    },
+    "SVR (RBF)": {
+      "MAE": 0.7876822722457647,
+      "MSE": 1.2754581286360769,
+      "RMSE": 1.1293618236137066,
+      "R2": 0.8845072716257494,
+      "Bias (pred - actual)": -0.02803032398662203,
+      "n": 2191.0
+    },
+    "Random Forest": {
+      "MAE": 0.8019041596782144,
+      "MSE": 1.2836308446145384,
+      "RMSE": 1.1329743353732857,
+      "R2": 0.8837672322270513,
+      "Bias (pred - actual)": -0.0731944598813692,
+      "n": 2191.0
+    }
+  },
+  "test_metrics": {
+    "Persistence (tomorrow = today)": {
+      "MAE": 0.8540164254986311,
+      "MSE": 1.4564731325772389,
+      "RMSE": 1.20684428679811,
+      "R2": 0.8678798066898362,
+      "Bias (pred - actual)": -0.00020336331638639015,
+      "n": 2557.0
+    },
+    "Seasonal average": {
+      "MAE": 1.1954403827845532,
+      "MSE": 2.5105034119940295,
+      "RMSE": 1.5844568192267119,
+      "R2": 0.7722661759564678,
+      "Bias (pred - actual)": 0.24611196178391498,
+      "n": 2557.0
+    },
+    "Linear Regression": {
+      "MAE": 0.7660762309618453,
+      "MSE": 1.118402678848673,
+      "RMSE": 1.0575455918534542,
+      "R2": 0.8985469935400572,
+      "Bias (pred - actual)": 0.005895194669816153,
+      "n": 2557.0
+    },
+    "SVR (RBF)": {
+      "MAE": 0.7409969909893788,
+      "MSE": 1.0685896253123934,
+      "RMSE": 1.0337260881454011,
+      "R2": 0.9030656558588994,
+      "Bias (pred - actual)": 0.0537025437076631,
+      "n": 2557.0
+    },
+    "Random Forest": {
+      "MAE": 0.7535179566223019,
+      "MSE": 1.0896200897679882,
+      "RMSE": 1.04384869103141,
+      "R2": 0.9011579316674074,
+      "Bias (pred - actual)": -0.07508902007613852,
+      "n": 2557.0
+    }
+  },
+  "test_hot_day_metrics": {
+    "Persistence (tomorrow = today)": {
+      "hot_days": 192.0,
+      "MAE_on_hot_days": 0.82421875,
+      "Bias_on_hot_days": -0.59390625,
+      "hit_rate (recall)": 0.5,
+      "precision": 0.4873096446700508,
+      "false_alarms": 101.0,
+      "missed": 96.0
+    },
+    "Seasonal average": {
+      "hot_days": 192.0,
+      "MAE_on_hot_days": 2.219876087443504,
+      "Bias_on_hot_days": -2.219876087443504,
+      "hit_rate (recall)": 0.0,
+      "precision": null,
+      "false_alarms": 0.0,
+      "missed": 192.0
+    },
+    "Linear Regression": {
+      "hot_days": 192.0,
+      "MAE_on_hot_days": 1.0734772170346756,
+      "Bias_on_hot_days": -1.0517850199531058,
+      "hit_rate (recall)": 0.234375,
+      "precision": 0.703125,
+      "false_alarms": 19.0,
+      "missed": 147.0
+    },
+    "SVR (RBF)": {
+      "hot_days": 192.0,
+      "MAE_on_hot_days": 0.9578012605977211,
+      "Bias_on_hot_days": -0.9195523817966657,
+      "hit_rate (recall)": 0.2864583333333333,
+      "precision": 0.625,
+      "false_alarms": 33.0,
+      "missed": 137.0
+    },
+    "Random Forest": {
+      "hot_days": 192.0,
+      "MAE_on_hot_days": 1.0740834275376516,
+      "Bias_on_hot_days": -1.0347788568795018,
+      "hit_rate (recall)": 0.24479166666666666,
+      "precision": 0.6811594202898551,
+      "false_alarms": 22.0,
+      "missed": 145.0
+    }
+  },
+  "heat_indicator": {
+    "definition": "Tmax above the 90th percentile of training-period (1981-2012) Tmax within \u00b17 days of the same calendar day",
+    "note": "Project-defined indicator. Not an IMD heat-wave criterion or alert.",
+    "probability_method": "P(hot) = 1 - Phi((threshold - prediction) / sigma_month); sigma_month = SD of out-of-fold time-series-CV errors on 1981-2012 by target month; flag cut-off chosen on 2013-2018 by maximum F1",
+    "sigma_by_month": {
+      "1": 0.6267567602822885,
+      "2": 0.710130536931839,
+      "3": 0.8529596195690179,
+      "4": 1.2329841873295164,
+      "5": 1.649195827687056,
+      "6": 1.6100223199882226,
+      "7": 1.3761111013037721,
+      "8": 1.368631550894947,
+      "9": 1.268238304040307,
+      "10": 1.098359085629335,
+      "11": 0.7552026784810258,
+      "12": 0.6141182003190548
+    },
+    "cutoff": 0.35,
+    "validation_flag": {
+      "hot_days": 293,
+      "flagged_days": 279,
+      "hits": 182,
+      "missed": 111,
+      "false_alarms": 97,
+      "recall (hit rate)": 0.621160409556314,
+      "precision": 0.6523297491039427,
+      "F1": 0.6363636363636364,
+      "Brier score": 0.06689347950630611
+    },
+    "validation_persistence_flag": {
+      "hot_days": 293,
+      "flagged_days": 295,
+      "hits": 187,
+      "missed": 106,
+      "false_alarms": 108,
+      "recall (hit rate)": 0.6382252559726962,
+      "precision": 0.6338983050847458,
+      "F1": 0.6360544217687075
+    },
+    "test_flag_metrics": {
+      "Persistence: today's Tmax above threshold": {
+        "hot_days": 192.0,
+        "flagged_days": 197.0,
+        "hits": 96.0,
+        "missed": 96.0,
+        "false_alarms": 101.0,
+        "recall (hit rate)": 0.5,
+        "precision": 0.4873096446700508,
+        "F1": 0.493573264781491,
+        "Brier score": null
+      },
+      "Linear Regression: predicted Tmax above threshold": {
+        "hot_days": 192.0,
+        "flagged_days": 64.0,
+        "hits": 45.0,
+        "missed": 147.0,
+        "false_alarms": 19.0,
+        "recall (hit rate)": 0.234375,
+        "precision": 0.703125,
+        "F1": 0.3515625,
+        "Brier score": null
+      },
+      "Linear Regression: chance of hot day >= 35% (deployed flag)": {
+        "hot_days": 192.0,
+        "flagged_days": 163.0,
+        "hits": 84.0,
+        "missed": 108.0,
+        "false_alarms": 79.0,
+        "recall (hit rate)": 0.4375,
+        "precision": 0.5153374233128835,
+        "F1": 0.4732394366197183,
+        "Brier score": 0.04954967832408333
+      }
+    },
+    "test_calibration": [
+      {
+        "chance_bin": "(-0.001, 0.1]",
+        "days": 1896,
+        "mean_predicted_chance": 0.01824321118405245,
+        "observed_frequency": 0.010021097046413503
+      },
+      {
+        "chance_bin": "(0.1, 0.2]",
+        "days": 287,
+        "mean_predicted_chance": 0.14138771040805423,
+        "observed_frequency": 0.13240418118466898
+      },
+      {
+        "chance_bin": "(0.2, 0.3]",
+        "days": 149,
+        "mean_predicted_chance": 0.24908652789281616,
+        "observed_frequency": 0.2214765100671141
+      },
+      {
+        "chance_bin": "(0.3, 0.5]",
+        "days": 161,
+        "mean_predicted_chance": 0.37732189921454806,
+        "observed_frequency": 0.35403726708074534
+      },
+      {
+        "chance_bin": "(0.5, 0.7]",
+        "days": 48,
+        "mean_predicted_chance": 0.5746411351367865,
+        "observed_frequency": 0.6458333333333334
+      },
+      {
+        "chance_bin": "(0.7, 1.0]",
+        "days": 16,
+        "mean_predicted_chance": 0.7953293769736914,
+        "observed_frequency": 0.875
+      }
+    ]
+  },
+  "input_columns": [
+    "tmax_lag0",
+    "tmax_lag1",
+    "tmax_lag2",
+    "tmax_lag3",
+    "tmax_lag4",
+    "tmax_lag5",
+    "tmax_lag6",
+    "tmax_change_1d",
+    "tmax_mean_3",
+    "tmax_mean_7",
+    "tmax_mean_14",
+    "tmax_mean_30",
+    "tmax_std_7",
+    "tmin_lag0",
+    "tmin_lag1",
+    "tmin_lag2",
+    "tmin_mean_7",
+    "tmean_lag0",
+    "dtr_lag0",
+    "rh_lag0",
+    "rh_lag1",
+    "rh_mean_7",
+    "qv_lag0",
+    "dewpoint_lag0",
+    "precip_lag0",
+    "precip_lag1",
+    "precip_sum_3",
+    "precip_sum_7",
+    "precip_sum_30",
+    "wind_speed_lag0",
+    "wind_u_lag0",
+    "wind_v_lag0",
+    "wind_u_mean_3",
+    "pressure_lag0",
+    "pressure_change_1d",
+    "target_doy_sin",
+    "target_doy_cos",
+    "years_since_1981",
+    "issue_doy",
+    "target_doy"
+  ],
+  "model_features": [
+    "tmax_lag0",
+    "tmax_lag1",
+    "tmax_lag2",
+    "tmax_lag3",
+    "tmax_lag4",
+    "tmax_lag5",
+    "tmax_lag6",
+    "tmax_change_1d",
+    "tmax_mean_3",
+    "tmax_mean_7",
+    "tmax_mean_14",
+    "tmax_mean_30",
+    "tmax_std_7",
+    "tmin_lag0",
+    "tmin_lag1",
+    "tmin_lag2",
+    "tmin_mean_7",
+    "tmean_lag0",
+    "dtr_lag0",
+    "rh_lag0",
+    "rh_lag1",
+    "rh_mean_7",
+    "qv_lag0",
+    "dewpoint_lag0",
+    "precip_lag0",
+    "precip_lag1",
+    "precip_sum_3",
+    "precip_sum_7",
+    "precip_sum_30",
+    "wind_speed_lag0",
+    "wind_u_lag0",
+    "wind_v_lag0",
+    "wind_u_mean_3",
+    "pressure_lag0",
+    "pressure_change_1d",
+    "target_doy_sin",
+    "target_doy_cos",
+    "years_since_1981",
+    "clim_tmax_target",
+    "tmax_anom_lag0",
+    "tmax_mean_7_anom"
+  ],
+  "feature_groups": {
+    "tmax_lag0": "Recent temperatures",
+    "tmax_lag1": "Recent temperatures",
+    "tmax_lag2": "Recent temperatures",
+    "tmax_lag3": "Recent temperatures",
+    "tmax_lag4": "Recent temperatures",
+    "tmax_lag5": "Recent temperatures",
+    "tmax_lag6": "Recent temperatures",
+    "tmax_change_1d": "Recent temperatures",
+    "tmax_mean_3": "Recent temperatures",
+    "tmax_mean_7": "Recent temperatures",
+    "tmax_mean_14": "Recent temperatures",
+    "tmax_mean_30": "Recent temperatures",
+    "tmax_std_7": "Recent temperatures",
+    "tmin_lag0": "Recent temperatures",
+    "tmin_lag1": "Recent temperatures",
+    "tmin_lag2": "Recent temperatures",
+    "tmin_mean_7": "Recent temperatures",
+    "tmean_lag0": "Recent temperatures",
+    "dtr_lag0": "Recent temperatures",
+    "rh_lag0": "Humidity & moisture",
+    "rh_lag1": "Humidity & moisture",
+    "rh_mean_7": "Humidity & moisture",
+    "qv_lag0": "Humidity & moisture",
+    "dewpoint_lag0": "Humidity & moisture",
+    "precip_lag0": "Rainfall",
+    "precip_lag1": "Rainfall",
+    "precip_sum_3": "Rainfall",
+    "precip_sum_7": "Rainfall",
+    "precip_sum_30": "Rainfall",
+    "wind_speed_lag0": "Wind (sea breeze vs land wind)",
+    "wind_u_lag0": "Wind (sea breeze vs land wind)",
+    "wind_v_lag0": "Wind (sea breeze vs land wind)",
+    "wind_u_mean_3": "Wind (sea breeze vs land wind)",
+    "pressure_lag0": "Surface pressure",
+    "pressure_change_1d": "Surface pressure",
+    "target_doy_sin": "Time of year",
+    "target_doy_cos": "Time of year",
+    "years_since_1981": "Slow drift across years",
+    "clim_tmax_target": "Time of year",
+    "tmax_anom_lag0": "Recent temperatures",
+    "tmax_mean_7_anom": "Recent temperatures",
+    "issue_doy": "Time of year",
+    "target_doy": "Time of year"
+  },
+  "random_seed": 42,
+  "versions": {
+    "python": "3.12.6",
+    "numpy": "2.5.1",
+    "pandas": "2.3.3",
+    "scikit-learn": "1.9.0",
+    "scipy": "1.18.1",
+    "joblib": "1.5.3",
+    "requests": "2.34.2"
+  }
+}
